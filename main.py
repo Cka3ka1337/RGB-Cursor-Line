@@ -1,23 +1,21 @@
+import sys
+import colorsys
+
+import pygame
 import win32api
 import win32con
 import win32gui
-import colorsys
-import sys
 
 from ctypes import wintypes, WinDLL
 
-import pygame
 
 
 def window_config(hwnd) -> None:
-    # Установить стиль окна как прозрачное и пропускающее клики
     ex_style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
     win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, ex_style | win32con.WS_EX_LAYERED | win32con.WS_EX_TRANSPARENT)
 
-    # Установить цвет ключа
     win32gui.SetLayeredWindowAttributes(hwnd, win32api.RGB(255, 0, 128), 0, win32con.LWA_COLORKEY)
 
-    # Установить позицию окна
     user32 = WinDLL("user32")
     user32.SetWindowPos.restype = wintypes.HWND
     user32.SetWindowPos.argtypes = [wintypes.HWND, wintypes.HWND, wintypes.INT, wintypes.INT, wintypes.INT, wintypes.INT, wintypes.UINT]
@@ -46,21 +44,8 @@ def main(s, v, size, width, fps):
     
     line_cords = [win32api.GetCursorPos() for _ in range(size)]
     h = 360 / size
-    
-    text = "Press pause to shutdown the program"
-    font_size = 24
-    font = pygame.font.SysFont("Arial", font_size, True)
-    
+
     sc.fill((255, 0, 128))
-    for i in range(len(text)):
-        pygame.event.get()
-        sc.blit(
-            font.render(text[i], False, hsv2rgb(360 / len(text) * i, s, v)),
-            (font_size * 0.6 * (i + 1), font_size, font_size, font_size)
-        )
-        pygame.display.update()
-        clock.tick(10)
-    clock.tick(5)
     
     while not win32api.GetAsyncKeyState(win32con.VK_PAUSE):
         x, y = win32api.GetCursorPos()
@@ -68,17 +53,11 @@ def main(s, v, size, width, fps):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
+                sys.exit(0)
+                
             elif event.type == pygame.USEREVENT:
                 line_cords.insert(0, (x, y))
                 line_cords.pop()
-                """for _ in range(5):
-                    if not (x, y) in line_cords:
-                        line_cords.insert(0, (x, y))
-                        line_cords.pop()
-                        break
-                    else:
-                        x, y = win32api.GetCursorPos()"""
                 
         sc.fill((255, 0, 128))
         
@@ -94,4 +73,10 @@ def main(s, v, size, width, fps):
 
 
 if __name__ == "__main__":
-    main(70, 100, 60, 4, 360)#0-100, 0-100
+    main(s=70, v=100, size=60, width=2, fps=360)
+    
+    # Для плавного переливания цветов, используется цветовое пространство HSV - Hue Saturation Value
+    # S - Saturation, это насыщение цвета (0 - 100)
+    # V - Value, это яркость цвета (0 - 100)
+    # Size - Длина полосы
+    # Width - Толщина полосы
