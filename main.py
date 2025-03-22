@@ -9,7 +9,6 @@ import win32gui
 from ctypes import wintypes, WinDLL
 
 
-
 def window_config(hwnd) -> None:
     ex_style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
     win32gui.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, ex_style | win32con.WS_EX_LAYERED | win32con.WS_EX_TRANSPARENT)
